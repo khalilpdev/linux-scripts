@@ -1,2 +1,35 @@
 # fedora-scripts
-Scripts to help me install my setup - dotnet 10 | vscode | drivers nvidia
+
+Personal collection of Bash scripts for automating Fedora Linux system setup, tailored for my C# development workflow and NVIDIA GeForce GT 630M GPU.
+
+## Prerequisites
+- Fedora Linux (version support varies per script, see details below)
+- `sudo` privileges (most scripts use `sudo` internally, do not run as root unless explicitly noted)
+
+## Available Scripts
+| Script | Description | Requirements/Notes |
+|--------|-------------|-------------------|
+| `fix-ssh-permission.sh` | Fixes SSH key permissions in `~/.ssh` | **Must run as root** (no root check, minimal validation) |
+| `install-dotnet10-fedora.sh` | Installs .NET 10 SDK for C# development | Supports Fedora 42+, warns on older versions |
+| `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
+| `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
+| `setup-nvidia-fedora.sh` | Installs NVIDIA 390xx drivers, disables Wayland | **Must run as root**, supports GeForce GT 630M/620M |
+
+## Usage
+1. (Optional) Make scripts executable:
+   ```bash
+   chmod +x <script-name>.sh
+   ```
+2. Run non-root scripts as a regular user (they handle `sudo` internally):
+   ```bash
+   ./install-dotnet10-fedora.sh
+   ```
+3. Run root-required scripts with `sudo`:
+   ```bash
+   sudo ./setup-nvidia-fedora.sh
+   ```
+
+## Important Notes
+- Scripts modify system state: install packages, add third-party repositories, edit `/etc` configuration files. Review scripts before running.
+- Most scripts include a `check_root` function that exits immediately if run as root (exceptions: `fix-ssh-permission.sh`, `setup-nvidia-fedora.sh`).
+- This is a personal project with no test suite or CI. Use at your own risk.
