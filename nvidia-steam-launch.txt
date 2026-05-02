@@ -1,0 +1,11 @@
+Depending on your specific setup or driver version, one of these commands might be more effective for your system.
+
+For Vulkan Games (and most modern titles): This is the standard, fully explicit command.
+__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia __VK_LAYER_NV_optimus=NVIDIA_only %command%
+
+For OpenGL Games (or older titles): The __GLX variable is the only one required for older OpenGL applications.
+__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia %command%
+
+For Problematic or Specific Games: If the standard command fails, you can try filtering by the exact GPU name reported by your system (find this by running nvidia-smi in the terminal).
+DXVK_FILTER_DEVICE_NAME="NVIDIA GeForce ..." %command%
+
