@@ -1,8 +1,8 @@
 #!/bin/bash
 # =============================================================================
 # Script: wine-2-fix-and-install-v9.sh
-# Descricao: Instala o Wine 9.x compilando do codigo-fonte oficial
-# Fonte: https://dl.winehq.org/wine/source/9.x/
+# Descricao: Instala o Wine (serie 10.x por padrao) compilando do codigo-fonte oficial
+# Fonte: https://dl.winehq.org/wine/source/
 # Autor: Leandro Khalil
 # =============================================================================
 
@@ -17,11 +17,11 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Variaveis padrao (podem ser alteradas por flags)
-WINE_MAJOR="9"
+WINE_SERIES="10"
 WINE_VERSION=""
-WINE_SOURCE_BASE_URL="https://dl.winehq.org/wine/source/9.x"
+WINE_SOURCE_BASE_URL=""
 BUILD_ROOT="$HOME/src"
-INSTALL_PREFIX="/opt/wine9"
+INSTALL_PREFIX="/opt/wine10"
 SOURCE_ARCHIVE=""
 SOURCE_DIR=""
 WIN64_ONLY="0"
@@ -48,16 +48,18 @@ show_help() {
 Uso: ./wine-2-fix-and-install-v9.sh [opcoes]
 
 Opcoes:
-  --version <versao>   Instala uma versao especifica (ex: 9.0)
-  --prefix <caminho>   Prefixo de instalacao (padrao: /opt/wine9)
+    --series <numero>    Serie do Wine no source (ex: 9, 10). Padrao: 10
+    --version <versao>   Instala uma versao especifica (ex: 10.0)
+    --prefix <caminho>   Prefixo de instalacao (padrao: /opt/wine10)
   --build-root <dir>   Pasta de trabalho para codigo-fonte (padrao: ~/src)
     --win64-only         Compila apenas 64-bit (dispensa libs 32-bit)
   -h, --help           Mostra esta ajuda
 
 Exemplos:
     ./wine-2-fix-and-install-v9.sh
-    ./wine-2-fix-and-install-v9.sh --version 9.0
-    ./wine-2-fix-and-install-v9.sh --prefix /opt/wine-9.0
+    ./wine-2-fix-and-install-v9.sh --series 10
+    ./wine-2-fix-and-install-v9.sh --version 10.0
+    ./wine-2-fix-and-install-v9.sh --prefix /opt/wine-10.0
     ./wine-2-fix-and-install-v9.sh --win64-only
 EOF
 }
@@ -65,6 +67,18 @@ EOF
 parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
+            --series)
+                shift
+                if [[ -z "$1" ]]; then
+                    log_error "Voce precisa informar um numero apos --series"
+                    exit 1
+                fi
+                if [[ ! "$1" =~ ^[0-9]+$ ]]; then
+                    log_error "Serie invalida: $1 (use apenas numero, ex: 10)"
+                    exit 1
+                fi
+                WINE_SERIES="$1"
+                ;;
             --version)
                 shift
                 if [[ -z "$1" ]]; then
@@ -182,25 +196,27 @@ install_multilib_dependencies() {
 }
 
 resolve_wine_version() {
+    WINE_SOURCE_BASE_URL="https://dl.winehq.org/wine/source/${WINE_SERIES}.x"
+
     if [[ -n "$WINE_VERSION" ]]; then
-        if [[ ! "$WINE_VERSION" =~ ^9\.[0-9]+$ ]]; then
-            log_error "Versao invalida: $WINE_VERSION (use formato 9.x)"
+        if [[ ! "$WINE_VERSION" =~ ^${WINE_SERIES}\.[0-9]+$ ]]; then
+            log_error "Versao invalida: $WINE_VERSION (use formato ${WINE_SERIES}.x)"
             exit 1
         fi
         log_info "Versao solicitada manualmente: $WINE_VERSION"
         return 0
     fi
 
-    log_info "Buscando a versao 9.x mais recente em: $WINE_SOURCE_BASE_URL/"
+    log_info "Buscando a versao ${WINE_SERIES}.x mais recente em: $WINE_SOURCE_BASE_URL/"
     WINE_VERSION=$(curl -fsSL "$WINE_SOURCE_BASE_URL/" \
-        | grep -oE 'wine-9\.[0-9]+\.tar\.xz' \
+        | grep -oE "wine-${WINE_SERIES}\.[0-9]+\.tar\.xz" \
         | sed 's/^wine-//; s/\.tar\.xz$//' \
         | sort -V \
         | tail -n 1)
 
     if [[ -z "$WINE_VERSION" ]]; then
-        log_error "Nao foi possivel detectar uma versao 9.x automaticamente."
-        log_error "Tente novamente com --version <9.x>."
+        log_error "Nao foi possivel detectar uma versao ${WINE_SERIES}.x automaticamente."
+        log_error "Tente novamente com --version <${WINE_SERIES}.x>."
         exit 1
     fi
 
@@ -289,7 +305,7 @@ print_post_install_notes() {
 # Funcao principal
 main() {
     echo "==========================================================================="
-    echo "           Instalador do Wine 9.x (codigo-fonte oficial WineHQ)          "
+    echo "          Instalador do Wine (codigo-fonte oficial WineHQ)                "
     echo "==========================================================================="
     echo ""
 
@@ -299,7 +315,7 @@ main() {
 
     log_warning "Este script ira:"
     echo "  1. Instalar dependencias de compilacao"
-    echo "  2. Baixar o Wine 9.x de https://dl.winehq.org/wine/source/9.x/"
+    echo "  2. Baixar o Wine ${WINE_SERIES}.x de https://dl.winehq.org/wine/source/${WINE_SERIES}.x/"
     echo "  3. Compilar e instalar em $INSTALL_PREFIX"
     echo ""
 
