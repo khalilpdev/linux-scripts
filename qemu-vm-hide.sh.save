@@ -1,0 +1,8 @@
+ Salvar o script
+nano qemu-vm-hide.sh
+
+# Dar permissão de execução
+chmod +x qemu-vm-hide.sh
+
+# Executar
+./qemu-vm-hide.sh
