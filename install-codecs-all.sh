@@ -82,7 +82,25 @@ dnf install -y \
     --skip-broken 2>/dev/null
 check_success "RPM Fusion Non-Free adicionado"
 
-# 3. Instalando codecs principais
+# 3. Remover VLC do Flatpak (se instalado) e instalar via RPM
+print_header "🎬 REMOVENDO VLC FLATPAK E INSTALANDO VIA RPM"
+
+if flatpak list 2>/dev/null | grep -qi vlc; then
+    echo -e "${YELLOW}Removendo VLC do Flatpak...${NC}"
+    flatpak uninstall -y org.videolan.VLC 2>/dev/null || \
+        flatpak uninstall -y --system org.videolan.VLC 2>/dev/null || \
+        echo -e "${YELLOW}⚠️  Não foi possível remover via flatpak, tentando via dnf...${NC}"
+    flatpak uninstall -y --unused 2>/dev/null
+    check_success "VLC Flatpak removido"
+else
+    echo -e "${CYAN}VLC Flatpak não encontrado.${NC}"
+fi
+
+echo -e "${YELLOW}Instalando VLC via RPM...${NC}"
+dnf install -y vlc vlc-extras vlc-plugin-ffmpeg vlc-plugin-bittorrent --skip-unavailable --skip-broken
+check_success "VLC RPM instalado"
+
+# 4. Instalando codecs principais
 print_header "🎵 INSTALANDO CODECS DE ÁUDIO"
 
 echo -e "${YELLOW}Instalando codecs de áudio (MP3, AAC, etc.)...${NC}"
@@ -101,7 +119,7 @@ dnf install -y \
     --skip-unavailable --skip-broken
 check_success "Codecs de áudio instalados"
 
-# 4. Instalando codecs de vídeo
+# 5. Instalando codecs de vídeo
 print_header "🎬 INSTALANDO CODECS DE VÍDEO"
 
 echo -e "${YELLOW}Instalando codecs de vídeo (H.264, H.265, etc.)...${NC}"
@@ -120,7 +138,7 @@ dnf install -y \
     --skip-unavailable --skip-broken
 check_success "Codecs de vídeo instalados"
 
-# 5. Codecs específicos para RealVideo (RV40)
+# 6. Codecs específicos para RealVideo (RV40)
 print_header "🎥 INSTALANDO CODECS REALVIDEO (RV40)"
 
 echo -e "${YELLOW}Instalando suporte a RealVideo...${NC}"
@@ -134,7 +152,7 @@ dnf install -y \
     --skip-unavailable --skip-broken
 check_success "Codecs RealVideo instalados"
 
-# 6. Instalando plugins completos do GStreamer
+# 7. Instalando plugins completos do GStreamer
 print_header "🎚️ INSTALANDO PLUGINS GSTREAMER"
 
 echo -e "${YELLOW}Instalando plugins GStreamer (good, bad, ugly)...${NC}"
@@ -149,7 +167,7 @@ dnf install -y \
     --skip-unavailable --skip-broken
 check_success "Plugins GStreamer instalados"
 
-# 7. Instalar codecs adicionais e suporte a DVDs
+# 8. Instalar codecs adicionais e suporte a DVDs
 print_header "💿 INSTALANDO CODECS ADICIONAIS E DVD"
 
 echo -e "${YELLOW}Instalando suporte a DVDs criptografados...${NC}"
@@ -158,27 +176,8 @@ dnf install -y \
     libdvdread \
     libdvdnav \
     lsdvd \
-    vlc-plugin-bittorrent \
-    vlc-extras \
     --skip-unavailable --skip-broken
 check_success "Suporte a DVDs instalado"
-
-# 8. Verificar se VLC está instalado e instalar plugins
-print_header "🎬 CONFIGURANDO VLC"
-
-if command -v vlc &> /dev/null; then
-    echo -e "${GREEN}VLC detectado. Instalando plugins adicionais...${NC}"
-    dnf install -y \
-        vlc-plugin-ffmpeg \
-        vlc-plugin-gstreamer \
-        vlc-extras \
-        --skip-unavailable --skip-broken
-    check_success "Plugins VLC instalados"
-else
-    echo -e "${YELLOW}VLC não está instalado. Instalando...${NC}"
-    dnf install -y vlc vlc-extras vlc-plugin-ffmpeg --skip-unavailable --skip-broken
-    check_success "VLC instalado"
-fi
 
 # 9. Instalar codecs de vídeo adicionais (WMV, QuickTime, etc.)
 print_header "🔧 INSTALANDO CODECS LEGADOS"
