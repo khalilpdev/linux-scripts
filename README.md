@@ -29,6 +29,30 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
    sudo ./setup-nvidia-fedora.sh
    ```
 
+## Versions
+
+### Go version
+The first Go version scans the repository tree and renders a graphical home screen where folders become modules and files become items.
+
+Run it with:
+```bash
+go run ./cmd/fedora-browser
+```
+
+Useful environment variables:
+```bash
+FEDORA_SCRIPTS_NO_BROWSER=1 go run ./cmd/fedora-browser
+FEDORA_SCRIPTS_ADDR=127.0.0.1:8080 go run ./cmd/fedora-browser
+```
+
+### Shell version
+The original Bash scripts now live under `shell-version/`, grouped by folder as modules. A terminal menu is available at:
+```bash
+bash shell-version/menu.sh
+```
+
+The menu shows each folder as a module and each script as an item. Scripts that need elevated permissions still call `sudo` when required.
+
 ## Important Notes
 - Scripts modify system state: install packages, add third-party repositories, edit `/etc` configuration files. Review scripts before running.
 - Most scripts include a `check_root` function that exits immediately if run as root (exceptions: `fix-ssh-permission.sh`, `setup-nvidia-fedora.sh`).
