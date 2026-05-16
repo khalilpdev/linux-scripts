@@ -36,6 +36,11 @@ The first Go version scans the repository tree and renders a graphical home scre
 
 Run it with:
 ```bash
+./go-run.sh
+```
+
+Or directly:
+```bash
 go run ./cmd/fedora-browser
 ```
 
@@ -47,6 +52,11 @@ FEDORA_SCRIPTS_ADDR=127.0.0.1:8080 go run ./cmd/fedora-browser
 
 ### Shell version
 The original Bash scripts now live under `shell-version/`, grouped by folder as modules. A terminal menu is available at:
+```bash
+./go-shell.sh
+```
+
+Or directly:
 ```bash
 bash shell-version/menu.sh
 ```
