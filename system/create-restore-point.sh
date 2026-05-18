@@ -25,11 +25,32 @@ if [ ! -d "$SNAPSHOT_DIR" ]; then
     mkdir -p "$SNAPSHOT_DIR"
 fi
 
-# 4. Create the read-only Btrfs snapshot of the root filesystem
+# 4. Check for existing snapshots and ask to remove them
+EXISTING_SNAPSHOTS=$(find "$SNAPSHOT_DIR" -maxdepth 1 -type d -name "backup_root_*" 2>/dev/null)
+if [ -n "$EXISTING_SNAPSHOTS" ]; then
+    echo "-> Existing restore points found:"
+    echo "$EXISTING_SNAPSHOTS" | while read -r snap; do
+        echo "   - $(basename "$snap")"
+    done
+    echo ""
+    read -rp "-> Do you want to remove all existing restore points before creating a new one? (y/N): " choice
+    case "$choice" in
+        [Yy]*)
+            echo "-> Removing existing restore points..."
+            find "$SNAPSHOT_DIR" -maxdepth 1 -type d -name "backup_root_*" -exec btrfs subvolume delete {} \;
+            echo "-> All existing restore points removed."
+            ;;
+        *)
+            echo "-> Keeping existing restore points."
+            ;;
+    esac
+fi
+
+# 5. Create the read-only Btrfs snapshot of the root filesystem
 echo "-> Creating instant system snapshot..."
 btrfs subvolume snapshot -r / "$SNAPSHOT_PATH"
 
-# 5. Verify the snapshot was created successfully
+# 6. Verify the snapshot was created successfully
 if [ -d "$SNAPSHOT_PATH" ]; then
     echo "============================================="
     echo "✅ Success! Restore point created in under 1s."
