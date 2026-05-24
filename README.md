@@ -11,6 +11,7 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
 |--------|-------------|-------------------|
 | `fix-ssh-permission.sh` | Fixes SSH key permissions in `~/.ssh` | **Must run as root** (no root check, minimal validation) |
 | `install-dotnet10-fedora.sh` | Installs .NET 10 SDK for C# development | Supports Fedora 42+, warns on older versions |
+| `dev/install-go-vscode-fedora.sh` | Installs Go and fixes VS Code Go PATH/GOPATH setup | Configures `~/go`, updates `~/.bashrc`, installs `gopls`/`dlv`, updates VS Code settings |
 | `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
 | `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
 | `setup-nvidia-fedora.sh` | Installs NVIDIA 390xx drivers, disables Wayland | **Must run as root**, supports GeForce GT 630M/620M |

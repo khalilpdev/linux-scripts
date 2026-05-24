@@ -10,5 +10,6 @@ Collection of Bash scripts for Fedora Linux system setup (package installs, driv
 ## Script-Specific Notes
 - `fix-ssh-permission.sh`: Minimal, no validation (no Fedora/root checks, no `set -e`), runs `chmod` on `~/.ssh`
 - `install-dotnet10-fedora.sh`: Supports Fedora 42+ (warns on older versions)
+- `dev/install-go-vscode-fedora.sh`: Installs Go from Fedora repos, sets `GOPATH=~/go`, adds `~/go/bin` to `PATH`, installs `gopls`/`dlv`, and updates VS Code user settings
 - `install-gnome-tweaks-extentions.sh`, `install-vscode-dotnet10-fedora.sh`: Target Fedora 44 (warns on version mismatch)
 - `setup-nvidia-fedora.sh`: Installs NVIDIA 390xx drivers (GeForce GT 630M/620M), disables Wayland, uses `sudo` directly (no root check)
