@@ -36,10 +36,29 @@ install_docker_cli() {
 }
 
 configure_user() {
-  if getent group docker >/dev/null 2>&1; then
-    echo "Adicionando usuario ao grupo 'docker'..."
-    sudo usermod -aG docker "${USER}"
+  local docker_gid
+
+  if [ -S /var/run/docker.sock ]; then
+    docker_gid="$(stat -c '%g' /var/run/docker.sock 2>/dev/null)"
+    echo "Docker socket encontrado (GID ${docker_gid})."
+  else
+    echo "AVISO: socket Docker nao encontrado em /var/run/docker.sock."
+    echo "Monte-o com -v /var/run/docker.sock:/var/run/docker.sock."
+    docker_gid=""
   fi
+
+  if ! getent group docker >/dev/null 2>&1; then
+    if [ -n "${docker_gid}" ]; then
+      sudo groupadd -g "${docker_gid}" docker
+    else
+      sudo groupadd docker
+    fi
+  elif [ -n "${docker_gid}" ] && [ "$(getent group docker | cut -d: -f3)" != "${docker_gid}" ]; then
+    sudo groupmod -g "${docker_gid}" docker
+  fi
+
+  echo "Adicionando usuario ao grupo 'docker'..."
+  sudo usermod -aG docker "${USER}"
 }
 
 validate_install() {
