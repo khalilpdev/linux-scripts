@@ -26,7 +26,8 @@ require_sudo() {
 add_docker_repo() {
   echo "Adicionando repositorio oficial do Docker..."
   sudo dnf install -y dnf-plugins-core
-  sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+  sudo curl -sSL https://download.docker.com/linux/fedora/docker-ce.repo \
+    -o /etc/yum.repos.d/docker-ce.repo
 }
 
 install_docker_cli() {
