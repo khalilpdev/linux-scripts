@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Instala os pacotes NVIDIA 390xx no Fedora 42+,
-# mas mantém o Nouveau como driver ativo.
+# Instala e ativa o NVIDIA 390xx no Fedora 42+ com sessão X11 no KDE.
 
 set -euo pipefail
 
@@ -59,10 +58,14 @@ install_repos() {
     sudo dnf install -y \
         https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
         https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+
+    print_info "Ativando suporte ao Plasma X11..."
+    sudo dnf install -y 'dnf-command(copr)'
+    sudo dnf copr enable -y @kdesig/plasma6-x11-unsupported
 }
 
 install_packages() {
-    print_info "Instalando o driver 390xx e dependências de build..."
+    print_info "Instalando o driver 390xx e dependências do KDE X11..."
     sudo dnf install -y \
         kernel-devel-$(uname -r) \
         kernel-headers \
@@ -72,27 +75,74 @@ install_packages() {
         akmod-nvidia-390xx \
         xorg-x11-drv-nvidia-390xx \
         xorg-x11-drv-nvidia-390xx-cuda \
-        xorg-x11-drv-nvidia-390xx-libs.i686
+        plasma-workspace-x11 \
+        kwin-x11
 }
 
-restore_nouveau() {
-    print_info "Removendo bloqueios automáticos do Nouveau..."
+configure_nvidia() {
+    print_info "Removendo bloqueios do Nouveau criados por instalações anteriores..."
     sudo rm -f /etc/modprobe.d/blacklist-nouveau.conf
     sudo rm -f /usr/lib/modprobe.d/nvidia-installer-disable-nouveau.conf
-    sudo rm -f /etc/modprobe.d/nvidia-optimus.conf
+    sudo rm -f /etc/modprobe.d/blacklist-nvidia-390xx.conf
 
-    print_info "Bloqueando o carregamento automático dos módulos NVIDIA..."
-    sudo tee /etc/modprobe.d/blacklist-nvidia-390xx.conf >/dev/null <<'EOF'
-blacklist nvidia
-blacklist nvidia-drm
-blacklist nvidia-modeset
-blacklist nvidia-uvm
+    print_info "Bloqueando o Nouveau e habilitando parâmetros do NVIDIA..."
+    sudo tee /etc/modprobe.d/blacklist-nouveau.conf >/dev/null <<'EOF'
+blacklist nouveau
+blacklist lbm-nouveau
+options nouveau modeset=0
+alias nouveau off
+alias lbm-nouveau off
+EOF
+
+    sudo tee /etc/modprobe.d/nvidia-optimus.conf >/dev/null <<'EOF'
+options nvidia modeset=1
+options nvidia_drm modeset=1
+options nvidia NVreg_UsePageAttributeTable=1
+options nvidia NVreg_EnableMSI=0
+options nvidia NVreg_RegisterForACPIEvents=1
+EOF
+
+    print_info "Criando fallback de Xorg para o NVIDIA 390xx..."
+    sudo mkdir -p /etc/X11/xorg.conf.d
+    sudo tee /etc/X11/xorg.conf.d/10-nvidia-390xx.conf >/dev/null <<'EOF'
+Section "Device"
+    Identifier "NVIDIA 390xx"
+    Driver "nvidia"
+    Option "AllowEmptyInitialConfiguration" "true"
+EndSection
 EOF
 }
 
-rebuild_boot_images() {
-    print_info "Recriando initramfs..."
-    sudo dracut --force --regenerate-all
+configure_x11() {
+    print_info "Configurando o SDDM para usar X11..."
+    local user_name
+    user_name="${SUDO_USER:-$USER}"
+
+    sudo mkdir -p /etc/sddm.conf.d
+    sudo tee /etc/sddm.conf.d/10-nvidia-x11.conf >/dev/null <<'EOF'
+[General]
+DisplayServer=x11
+
+[X11]
+SessionDir=/usr/share/xsessions
+EOF
+
+    sudo mkdir -p /var/lib/sddm
+    sudo tee /var/lib/sddm/state.conf >/dev/null <<EOF
+[Last]
+Session=plasmax11.desktop
+User=${user_name}
+EOF
+}
+
+rebuild_boot_image() {
+    print_info "Recriando initramfs do kernel atual..."
+    local kernel_version
+    kernel_version="$(uname -r)"
+
+    if ! sudo dracut --force "/boot/initramfs-${kernel_version}.img" "${kernel_version}"; then
+        print_warning "O dracut falhou. Você pode precisar recriar o initramfs manualmente depois."
+    fi
 }
 
 main() {
@@ -100,17 +150,19 @@ main() {
     check_fedora
     install_repos
     install_packages
-    restore_nouveau
-    rebuild_boot_images
+    configure_nvidia
+    configure_x11
+    rebuild_boot_image
 
     echo
     echo "=========================================="
-    print_success "Driver NVIDIA 390xx instalado sem desativar o Nouveau."
+    print_success "Driver NVIDIA 390xx ativado com SDDM e sessão Plasma X11."
     echo "=========================================="
     echo
-    echo "Após reiniciar, o sistema deve continuar usando Nouveau/Wayland."
+    echo "Após reiniciar, selecione Plasma (X11) na tela de login se necessário."
     echo "Verifique com:"
     echo "  lsmod | grep -E 'nouveau|nvidia'"
+    echo "  echo \$XDG_SESSION_TYPE"
     echo "  glxinfo | grep \"OpenGL renderer\""
     echo
     read -r -p "Deseja reiniciar agora? (s/N): " reply

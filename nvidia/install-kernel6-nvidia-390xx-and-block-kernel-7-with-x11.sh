@@ -48,7 +48,7 @@ mkdir -p /var/lib/sddm
 # Define o "plasma-x11" como a última sessão usada globalmente, forçando o login automático nela
 cat <<EOF > /var/lib/sddm/state.conf
 [Last]
-Session=plasma-x11.desktop
+Session=plasmax11.desktop
 User=$USUARIO_REAL
 EOF
 

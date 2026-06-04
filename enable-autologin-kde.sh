@@ -28,10 +28,11 @@ echo "-> Writing auto-login configurations to $CONFIG_FILE..."
 sudo tee "$CONFIG_FILE" > /dev/null <<EOF
 [Autologin]
 Relogin=false
-Session=plasmawayland.desktop
+Session=plasmax11.desktop
 User=$TARGET_USER
 
 [General]
+DisplayServer=x11
 NumLock=on
 EOF
 

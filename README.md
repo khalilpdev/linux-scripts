@@ -15,7 +15,8 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
 | `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
 | `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
 | `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh` | Installs/Repara NVIDIA 390xx and disables Nouveau/Wayland | Runs with `sudo` internally, supports GeForce GT 630M/620M |
-| `shell-version/nvidia/install-nvidia-fedora-390xx-nouveau.sh` | Installs NVIDIA 390xx packages but keeps Nouveau active | Runs with `sudo` internally, Fedora 42+ |
+| `shell-version/nvidia/install-nvidia-fedora-390xx-x11.sh` | Installs NVIDIA 390xx, forces SDDM X11, and activates Plasma X11 | Runs with `sudo` internally, Fedora 42+ |
+| `shell-version/nvidia/setup-gpu-launchers.sh` | Creates Intel/NVIDIA launchers for apps without changing boot behavior | Creates files in `~/.local`, no system-wide changes |
 | `remove-snapshots.sh` | Interactively removes selected Btrfs restore points from `/.snapshots` | Must run with `sudo`, root filesystem must be Btrfs |
 
 ## Usage
