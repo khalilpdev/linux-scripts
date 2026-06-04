@@ -12,6 +12,6 @@ Collection of Bash scripts for Fedora Linux system setup (package installs, driv
 - `install-dotnet10-fedora.sh`: Supports Fedora 42+ (warns on older versions)
 - `dev/install-go-vscode-fedora.sh`: Installs Go from Fedora repos, sets `GOPATH=~/go`, adds `~/go/bin` to `PATH`, installs `gopls`/`dlv`, and updates VS Code user settings
 - `install-gnome-tweaks-extentions.sh`, `install-vscode-dotnet10-fedora.sh`: Target Fedora 44 (warns on version mismatch)
-- `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh`: Installs/Repara NVIDIA 390xx and disables Nouveau/Wayland; `shell-version/nvidia/install-nvidia-fedora-390xx-x11.sh`: installs 390xx and activates Plasma X11; `shell-version/nvidia/setup-gpu-launchers.sh`: creates per-user Intel/NVIDIA app launchers without changing boot behavior
+- NVIDIA 390xx was discarded in this repo to avoid forcing boot/session through the NVIDIA path. The supported script is `shell-version/nvidia/restore-intel-x11.sh`; old 390xx install/repair scripts now redirect to it, and `shell-version/nvidia/setup-gpu-launchers.sh` only warns that the NVIDIA launcher flow was removed.
 - On Fedora KDE, the Plasma X11 session file is `plasmax11.desktop` (not `plasma-x11.desktop`); writing the wrong session name to `/var/lib/sddm/state.conf` causes SDDM login/session startup failures.
 - `remove-snapshots.sh`: Interactively removes selected Btrfs snapshots from `/.snapshots`; run it with `sudo`

@@ -14,9 +14,10 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
 | `dev/install-go-vscode-fedora.sh` | Installs Go and fixes VS Code Go PATH/GOPATH setup | Configures `~/go`, updates `~/.bashrc`, installs `gopls`/`dlv`, updates VS Code settings |
 | `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
 | `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
-| `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh` | Installs/Repara NVIDIA 390xx and disables Nouveau/Wayland | Runs with `sudo` internally, supports GeForce GT 630M/620M |
-| `shell-version/nvidia/install-nvidia-fedora-390xx-x11.sh` | Installs NVIDIA 390xx, forces SDDM X11, and activates Plasma X11 | Runs with `sudo` internally, Fedora 42+ |
-| `shell-version/nvidia/setup-gpu-launchers.sh` | Creates Intel/NVIDIA launchers for apps without changing boot behavior | Creates files in `~/.local`, no system-wide changes |
+| `shell-version/nvidia/restore-intel-x11.sh` | Removes the NVIDIA 390xx flow, restores Intel + Plasma X11 defaults, and rebuilds initramfs | Run as a normal user on the installed system, or with `TARGET_ROOT=/mounted/root` from a Fedora live CD |
+| `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh` | Deprecated wrapper that now redirects to `restore-intel-x11.sh` | 390xx was discarded to avoid forcing boot/session through NVIDIA |
+| `shell-version/nvidia/install-nvidia-fedora-390xx-x11.sh` | Deprecated wrapper that now redirects to `restore-intel-x11.sh` | 390xx was discarded to avoid forcing boot/session through NVIDIA |
+| `shell-version/nvidia/setup-gpu-launchers.sh` | Deprecated notice; the NVIDIA launcher flow was removed with 390xx | Keeps users on the Intel default path |
 | `remove-snapshots.sh` | Interactively removes selected Btrfs restore points from `/.snapshots` | Must run with `sudo`, root filesystem must be Btrfs |
 
 ## Usage
@@ -66,6 +67,8 @@ bash shell-version/menu.sh
 ```
 
 The menu shows each folder as a module and each script as an item. Scripts that need elevated permissions still call `sudo` when required.
+
+The NVIDIA 390xx flow has been discarded in this repository. The supported recovery path is `shell-version/nvidia/restore-intel-x11.sh`, and old 390xx scripts now redirect to it. From a Fedora live CD, run it with `TARGET_ROOT=/mounted/root`.
 
 ## Important Notes
 - Scripts modify system state: install packages, add third-party repositories, edit `/etc` configuration files. Review scripts before running.
