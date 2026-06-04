@@ -14,7 +14,9 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
 | `dev/install-go-vscode-fedora.sh` | Installs Go and fixes VS Code Go PATH/GOPATH setup | Configures `~/go`, updates `~/.bashrc`, installs `gopls`/`dlv`, updates VS Code settings |
 | `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
 | `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
-| `setup-nvidia-fedora.sh` | Installs NVIDIA 390xx drivers, disables Wayland | **Must run as root**, supports GeForce GT 630M/620M |
+| `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh` | Installs/Repara NVIDIA 390xx and disables Nouveau/Wayland | Runs with `sudo` internally, supports GeForce GT 630M/620M |
+| `shell-version/nvidia/install-nvidia-fedora-390xx-nouveau.sh` | Installs NVIDIA 390xx packages but keeps Nouveau active | Runs with `sudo` internally, Fedora 42+ |
+| `remove-snapshots.sh` | Interactively removes selected Btrfs restore points from `/.snapshots` | Must run with `sudo`, root filesystem must be Btrfs |
 
 ## Usage
 1. (Optional) Make scripts executable:
@@ -27,7 +29,7 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
    ```
 3. Run root-required scripts with `sudo`:
    ```bash
-   sudo ./setup-nvidia-fedora.sh
+   sudo bash shell-version/fix-ssh-permission.sh
    ```
 
 ## Versions
