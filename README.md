@@ -12,6 +12,8 @@ Personal collection of Bash scripts for automating Fedora Linux system setup, ta
 | `fix-ssh-permission.sh` | Fixes SSH key permissions in `~/.ssh` | **Must run as root** (no root check, minimal validation) |
 | `install-dotnet10-fedora.sh` | Installs .NET 10 SDK for C# development | Supports Fedora 42+, warns on older versions |
 | `dev/install-go-vscode-fedora.sh` | Installs Go and fixes VS Code Go PATH/GOPATH setup | Configures `~/go`, updates `~/.bashrc`, installs `gopls`/`dlv`, updates VS Code settings |
+| `shell-version/dev/install-java-sdk-21.sh` | Installs Oracle JDK 21 on Fedora and configures global `JAVA_HOME`/`PATH` | Run as a normal user on Fedora; creates `/opt/java/jdk-21` symlink |
+| `shell-version/dev/install-java-sdk-21-linux-mint.sh` | Installs Oracle JDK 21 on Linux Mint 21 and configures global `JAVA_HOME`/`PATH` | Run as a normal user on Linux Mint; warns outside Mint 21 and creates `/opt/java/jdk-21` symlink |
 | `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
 | `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
 | `shell-version/nvidia/restore-intel-x11.sh` | Removes the NVIDIA 390xx flow, restores Intel + Plasma X11 defaults, and rebuilds initramfs | Run as a normal user on the installed system, or with `TARGET_ROOT=/mounted/root` from a Fedora live CD |
