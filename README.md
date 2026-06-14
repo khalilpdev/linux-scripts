@@ -1,78 +1,167 @@
-# fedora-scripts
+# Linux Scripts
 
-Personal collection of Bash scripts for automating Fedora Linux system setup, tailored for my C# development workflow and NVIDIA GeForce GT 630M GPU.
+Personal collection of Bash and Go scripts for automating Linux system setup, with a focus on Fedora, Ubuntu, and Linux Mint. Tailored for C# development and GPU management.
+
+## Supported Distributions
+
+| Distribution | Status | Scripts Location |
+|--------------|--------|-----------------|
+| **Fedora** | ✅ Primary (Fedora 42+) | `fedora/` & `fedora/shell-version/` |
+| **Ubuntu** | ✅ Supported | `ubuntu/` |
+| **Linux Mint** | ✅ Supported (Mint 21) | `linux-mint/` |
 
 ## Prerequisites
-- Fedora Linux (version support varies per script, see details below)
-- `sudo` privileges (most scripts use `sudo` internally, do not run as root unless explicitly noted)
 
-## Available Scripts
-| Script | Description | Requirements/Notes |
-|--------|-------------|-------------------|
-| `fix-ssh-permission.sh` | Fixes SSH key permissions in `~/.ssh` | **Must run as root** (no root check, minimal validation) |
-| `install-dotnet10-fedora.sh` | Installs .NET 10 SDK for C# development | Supports Fedora 42+, warns on older versions |
-| `dev/install-go-vscode-fedora.sh` | Installs Go and fixes VS Code Go PATH/GOPATH setup | Configures `~/go`, updates `~/.bashrc`, installs `gopls`/`dlv`, updates VS Code settings |
-| `shell-version/dev/install-java-sdk-21.sh` | Installs Oracle JDK 21 on Fedora and configures global `JAVA_HOME`/`PATH` | Run as a normal user on Fedora; creates `/opt/java/jdk-21` symlink |
-| `shell-version/dev/install-java-sdk-21-linux-mint.sh` | Installs Oracle JDK 21 on Linux Mint 21 and configures global `JAVA_HOME`/`PATH` | Run as a normal user on Linux Mint; warns outside Mint 21 and creates `/opt/java/jdk-21` symlink |
-| `install-gnome-tweaks-extentions.sh` | Installs GNOME Tweaks and common extensions | Targets Fedora 44, warns on version mismatch |
-| `install-vscode-dotnet10-fedora.sh` | Sets up VS Code with .NET 10 support, adds Microsoft VS Code repo | Targets Fedora 44, warns on version mismatch |
-| `shell-version/nvidia/restore-intel-x11.sh` | Removes the NVIDIA 390xx flow, restores Intel + Plasma X11 defaults, and rebuilds initramfs | Run as a normal user on the installed system, or with `TARGET_ROOT=/mounted/root` from a Fedora live CD |
-| `shell-version/nvidia/install-nvidia-fedora-390xx-kernel-7.sh` | Deprecated wrapper that now redirects to `restore-intel-x11.sh` | 390xx was discarded to avoid forcing boot/session through NVIDIA |
-| `shell-version/nvidia/install-nvidia-fedora-390xx-x11.sh` | Deprecated wrapper that now redirects to `restore-intel-x11.sh` | 390xx was discarded to avoid forcing boot/session through NVIDIA |
-| `shell-version/nvidia/setup-gpu-launchers.sh` | Deprecated notice; the NVIDIA launcher flow was removed with 390xx | Keeps users on the Intel default path |
-| `remove-snapshots.sh` | Interactively removes selected Btrfs restore points from `/.snapshots` | Must run with `sudo`, root filesystem must be Btrfs |
+- Linux system (Fedora, Ubuntu, or Linux Mint)
+- `sudo` privileges for most scripts (they handle `sudo` internally)
+- Bash 4.0+ or Go 1.18+ (depending on which scripts you use)
 
-## Usage
-1. (Optional) Make scripts executable:
-   ```bash
-   chmod +x <script-name>.sh
-   ```
-2. Run non-root scripts as a regular user (they handle `sudo` internally):
-   ```bash
-   ./install-dotnet10-fedora.sh
-   ```
-3. Run root-required scripts with `sudo`:
-   ```bash
-   sudo bash shell-version/fix-ssh-permission.sh
-   ```
+## Repository Structure
 
-## Versions
-
-### Go version
-The first Go version scans the repository tree and renders a graphical home screen where folders become modules and files become items.
-
-Run it with:
-```bash
-./go-run.sh
+```
+.
+├── fedora/                          # Fedora-specific scripts
+│   ├── shell-version/              # Original Bash script collection
+│   │   ├── dev/                    # Development tools (Java, .NET, Git, etc.)
+│   │   ├── nvidia/                 # GPU setup & restoration
+│   │   ├── vm/                     # Virtualization tools
+│   │   ├── wine/                   # Wine & Proton setup
+│   │   └── menu.sh                 # Interactive terminal menu
+│   ├── dev/                        # Root-level dev scripts
+│   ├── nvidia/                     # Root-level GPU scripts
+│   ├── go-run.sh                   # Launch Go TUI browser
+│   ├── go-shell.sh                 # Launch shell menu
+│   └── *.sh                        # Utility scripts
+├── ubuntu/                          # Ubuntu-specific scripts
+├── linux-mint/                      # Linux Mint-specific scripts
+└── README.md
 ```
 
-Or directly:
-```bash
-go run ./cmd/fedora-browser
-```
+## Quick Start
 
-Useful environment variables:
-```bash
-FEDORA_SCRIPTS_NO_BROWSER=1 go run ./cmd/fedora-browser
-FEDORA_SCRIPTS_ADDR=127.0.0.1:8080 go run ./cmd/fedora-browser
-```
+### Interactive Menu (Recommended)
 
-### Shell version
-The original Bash scripts now live under `shell-version/`, grouped by folder as modules. A terminal menu is available at:
+**Fedora shell version:**
 ```bash
-./go-shell.sh
-```
-
-Or directly:
-```bash
+cd fedora
 bash shell-version/menu.sh
 ```
 
-The menu shows each folder as a module and each script as an item. Scripts that need elevated permissions still call `sudo` when required.
+**Fedora Go TUI browser:**
+```bash
+cd fedora
+./go-run.sh
+```
 
-The NVIDIA 390xx flow has been discarded in this repository. The supported recovery path is `shell-version/nvidia/restore-intel-x11.sh`, and old 390xx scripts now redirect to it. From a Fedora live CD, run it with `TARGET_ROOT=/mounted/root`.
+### Direct Script Execution
+
+Make script executable (optional):
+```bash
+chmod +x fedora/shell-version/dev/install-dotnet10-fedora.sh
+```
+
+Run as regular user (handles `sudo` internally):
+```bash
+./fedora/shell-version/dev/install-dotnet10-fedora.sh
+```
+
+Run root-only scripts with `sudo`:
+```bash
+sudo bash fedora/shell-version/fix-ssh-permission.sh
+```
+
+## Key Scripts by Category
+
+### Development Tools
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Install .NET 10 SDK | `fedora/shell-version/dev/install-dotnet10-fedora.sh` | Fedora 42+ | C# development |
+| Install Go + VS Code | `fedora/shell-version/dev/install-go-vscode-fedora.sh` | Fedora | Go tooling with VS Code setup |
+| Install JDK 21 | `fedora/shell-version/dev/install-java-sdk-21.sh` | Fedora | Java development |
+| Install JDK 21 | `fedora/shell-version/dev/install-java-sdk-21-linux-mint.sh` | Linux Mint 21 | Java development |
+| Install Git | `fedora/shell-version/dev/install-git-fedora.sh` | Fedora | Git version control |
+| Install JetBrains Rider | `fedora/shell-version/dev/install-jetbrains-rider-fedora.sh` | Fedora | C# IDE |
+| Install Docker | `fedora/shell-version/dev/install-docker-container-fedora.sh` | Fedora | Container runtime |
+
+### GPU & Display Management
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Restore Intel + X11 | `fedora/shell-version/nvidia/restore-intel-x11.sh` | Fedora | Remove NVIDIA, keep Intel iGPU + X11 |
+| Fix GNOME NVIDIA | `fedora/shell-version/nvidia/consertar_gnome_nvidia.sh` | Fedora | Troubleshoot GNOME under NVIDIA |
+| Fix GTK3 Dark Theme | `fedora/shell-version/fix-gtk3-dark-theme.sh` | Fedora | Apply dark theme to GTK apps |
+| Fix Qt5 Dark Theme | `fedora/shell-version/fix-qt5-dark-theme.sh` | Fedora | Apply dark theme to Qt apps |
+| Fix Dark GNOME | `fedora/fix-gnome-dark.sh` | Fedora | GNOME dark mode fixes |
+
+### Desktop Environment
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Install GNOME Tweaks + Extensions | `fedora/shell-version/install-gnome-tweaks-extentions.sh` | Fedora 44 | GNOME customization |
+| Install VS Code + .NET | `fedora/shell-version/dev/install-vscode-dotnet10-fedora.sh` | Fedora 44 | VS Code with C# support |
+| Enable KDE Autologin | `fedora/enable-autologin-kde.sh` | Fedora | Skip login screen |
+| Install Codecs | `fedora/shell-version/install-codecs-all.sh` | Fedora | Media codec support |
+
+### System Utilities
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Fix SSH Permissions | `fedora/shell-version/fix-ssh-permission.sh` | Fedora | Fix `~/.ssh` ownership/perms |
+| Remove Snapshots | `fedora/shell-version/remove-snapshots.sh` | Fedora (Btrfs) | Clean up Btrfs snapshots |
+| Clear Flatpak Cache | `fedora/shell-version/clear-flatpak-cache-objects.sh` | Fedora | Reclaim disk space |
+| Clean Temp Files | `fedora/shell-version/limpar_temp.sh` | Fedora | Remove temporary files |
+| Clean Flatpak | `fedora/shell-version/limpar-flatpak.sh` | Fedora | Remove unused flatpaks |
+
+### Virtualization
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Setup OSX-KVM | `fedora/shell-version/vm/setup-osx-kvm-fedora.sh` | Fedora | macOS KVM virtualization |
+| Fix VirtualBox | `fedora/shell-version/vm/fix-virtualbox-fedora.sh` | Fedora | VirtualBox setup |
+| Enable Android Virt | `fedora/shell-version/vm/enable-android-virtualization.sh` | Fedora | Android emulation support |
+| Fix Boxes NAT | `fedora/shell-version/vm/fix-boxes-nat.sh` | Fedora | GNOME Boxes networking |
+| Resize Boxes HD | `fedora/shell-version/vm/resize-hd-boxes.sh` | Fedora | Expand GNOME Boxes disk |
+| QEMU VM Hide | `fedora/shell-version/vm/qemu-vm-hide.sh` | Fedora | Hide guest OS info |
+
+### Wine & Proton
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Wine Setup v12 | `fedora/shell-version/wine/wine-1-fix-install-v12.sh` | Fedora | Wine installation (version 1.x) |
+| Wine Setup v9 | `fedora/shell-version/wine/wine-2-fix-and-install-v9.sh` | Fedora | Wine installation (version 9.x) |
+| Remove Wine | `fedora/shell-version/wine/wine-3-remove-and-flatpak.sh` | Fedora | Uninstall Wine & use Flatpak |
+
+### System Maintenance
+
+| Script | Location | Platform | Purpose |
+|--------|----------|----------|---------|
+| Create Restore Point | `fedora/create-restore-point.sh` | Fedora | Snapshot Btrfs filesystem |
+| Restore System | `fedora/restore-system.sh` | Fedora | Restore from Btrfs snapshot |
+| Clean bin/obj | `fedora/shell-version/dev/limpa-bin-obj.sh` | Fedora | Remove .NET build artifacts |
+| Fix Oh-My-Bash | `fedora/shell-version/fix-oh-my-bash.sh` | Fedora | Repair oh-my-bash setup |
 
 ## Important Notes
-- Scripts modify system state: install packages, add third-party repositories, edit `/etc` configuration files. Review scripts before running.
-- Most scripts include a `check_root` function that exits immediately if run as root (exceptions: `fix-ssh-permission.sh`, `setup-nvidia-fedora.sh`).
-- This is a personal project with no test suite or CI. Use at your own risk.
+
+⚠️ **Review Before Running**
+- Scripts modify system state: install packages, add repositories, edit `/etc` files
+- Always review a script before executing it on your system
+- Test in a VM first if you're unfamiliar with a script
+
+**Script Permissions**
+- Most scripts exit if run as root (use them as a regular user)
+- Exceptions: `fix-ssh-permission.sh`, scripts that explicitly require `sudo`
+- Scripts handle `sudo` calls internally for operations requiring elevation
+
+**GPU Management**
+- NVIDIA 390xx support has been deprecated
+- Recommended path: `restore-intel-x11.sh` (keep Intel iGPU + X11)
+- Can be run from mounted filesystem via `TARGET_ROOT=/mounted/root` during live boot
+
+**Btrfs Features**
+- `remove-snapshots.sh`, `create-restore-point.sh`, `restore-system.sh` require Btrfs root filesystem
+- Verify your root is Btrfs before running: `mount | grep "on / "`
+
+---
+
+**Disclaimer:** This is a personal project with no test suite or CI. Use at your own risk. Always maintain backups before running system scripts.
